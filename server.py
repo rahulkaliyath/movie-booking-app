@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify,render_template,redirect,url_for
 from model import db_connection
-from controllers import authentication,movies
+from controllers import authentication,movies,availability,booking
 from flask_cors import CORS, cross_origin
 from functools import wraps
 from time import time
@@ -13,6 +13,8 @@ CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 auth=authentication.Authenticate()
 movies = movies.Movies()
+timing = availability.Availabilty()
+booking = booking.Booking()
 
 def validate_token(function):
     @wraps(function)
@@ -48,17 +50,36 @@ def movie_details():
     result = movies.movie_details()
     return jsonify(result)
 
-# @app.route('/book_ticket',methods=['POST'])
-# @validate_token
-# def book_ticket(input,start_time):
-#     result = booking.book_ticket(input)
-#     return jsonify(result)
+@app.route('/show_timings',methods=['GET'])
+def show_timings():
+    result = timing.show_timings()
+    return jsonify(result)
 
-# @app.route('/cancel_ticket',methods=['POST'])
-# @validate_token
-# def cancel_ticket(input,start_time):
-#     result = booking.cancel_ticket(input)
-#     return jsonify(result)
+
+@app.route('/add_show_time',methods=['POST'])
+@validate_token
+def add_show_time(input,start_time):
+    result = timing.add_show_time(input)
+    return jsonify(result)
+
+
+@app.route('/check_availability',methods=['GET'])
+def check_availability():
+    result = timing.check_availability()
+    return jsonify(result)
+
+
+@app.route('/book_ticket',methods=['POST'])
+@validate_token
+def book_ticket(input,start_time):
+    result = booking.book_ticket(input)
+    return jsonify(result)
+
+@app.route('/cancel_ticket',methods=['POST'])
+@validate_token
+def cancel_ticket(input,start_time):
+    result = booking.cancel_ticket(input)
+    return jsonify(result)
 
 @app.route('/add_movie',methods=['POST'])
 @validate_token

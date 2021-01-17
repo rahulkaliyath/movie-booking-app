@@ -72,3 +72,7 @@ class Database:
     def update_one(self,collection,key,key_id,new_values):
         self.db[collection].update_one({key:key_id},{"$set":new_values})   
 
+    def update_array_value(self,collection,filter,operation):
+        self.db[collection].update_one(filter,operation)   
+
+
