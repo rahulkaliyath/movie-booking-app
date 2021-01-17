@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify,render_template,redirect,url_for
 from model import db_connection
-from controllers import authentication,contacts,movies
+from controllers import authentication,movies
 from flask_cors import CORS, cross_origin
 from functools import wraps
 from time import time
@@ -43,10 +43,10 @@ def list_movies():
     result = movies.list_movies()
     return jsonify(result)
 
-# @app.route('/movie_details',methods=['GET'])
-# def movie_details(input,start_time):
-#     result = movies.list_movies(input)
-#     return jsonify(result)
+@app.route('/movie_details',methods=['GET'])
+def movie_details():
+    result = movies.movie_details()
+    return jsonify(result)
 
 # @app.route('/book_ticket',methods=['POST'])
 # @validate_token

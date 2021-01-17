@@ -1,9 +1,10 @@
 import pymongo
 from pymongo import MongoClient
+from config import mongo
 
 class Database:
     def __init__(self):
-        self.mongo = MongoClient("")
+        self.mongo = MongoClient(mongo.MONGO_URI)
         self.db = self.mongo['movie_booking']
 
     
@@ -22,6 +23,11 @@ class Database:
     def get_values(self,collection,query,fields_req,not_req):
         req_fields=self.get_req_fields(fields_req,not_req)
         data=[item for item in self.db[collection].find(query,req_fields)]
+        return data
+
+    def get_one_value(self,collection,query,fields_req,not_req):
+        req_fields=self.get_req_fields(fields_req,not_req)
+        data=self.db[collection].find_one(query,req_fields)
         return data
 
     def get_values_with_range(self,collection,query,fields_req,not_req,start,end):

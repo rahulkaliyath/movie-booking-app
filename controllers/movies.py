@@ -20,6 +20,22 @@ class Movies:
 
         return output
 
+    def movie_details(self):
+        output ={"status": "" , "message" : ""}
+        try:
+            input = request.get_json(force=True)
+            body = input['body']
+            movie_id = body['movie_id']
+            movie = self.db.get_one_value('movies',{"movie_id":movie_id},[],["_id"])
+            output['movie_details'] = movie
+            output["status"] = "success"
+
+        except Exception as e:
+            output["status"] = "error"
+            output['message'] = str(e)
+
+        return output
+
     def add_movie(self,input):
         output ={"status": "" , "message" : ""}
         
