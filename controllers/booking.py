@@ -29,6 +29,7 @@ class Booking:
         output ={"status": "" , "message" : ""}
         try:
             body = input['body']
+            user_id = input['user_id']
             movie_id = body['movie_id']
             date = body['date']
             time = body['time']
@@ -71,7 +72,11 @@ class Booking:
                     "active": True
                 }
 
+                booking_id = booking_details['booking_id']
+
                 self.db.insert_one_data('bookings',copy.copy(booking_details))
+                self.db.insert_one_to_array('account_details',"user_id",user_id,"upcoming_movies",booking_id)
+
 
                 
 
@@ -90,6 +95,7 @@ class Booking:
         output ={"status": "" , "message" : ""}
         try:
             body = input['body']
+            user_id = input['user_id']
             movie_id = body['movie_id']
             booking_id = body['booking_id']
            
@@ -123,6 +129,8 @@ class Booking:
                         }
                 
                 self.db.update_array_value("timings",filters,operation)
+                self.db.delete_one_from_array('account_details',"user_id",user_id,"upcoming_movies",booking_id)
+                self.db.insert_one_to_array('account_details',"user_id",user_id,"cancelled_movies",booking_id)
 
                 output["status"] = ticket
                 output['message'] = "status"

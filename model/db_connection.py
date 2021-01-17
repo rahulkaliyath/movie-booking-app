@@ -55,7 +55,7 @@ class Database:
         self.db[collection].insert_many(data)
 
     def insert_one_to_array(self,collection,key,key_id,field,value):
-        self.db[collection].update_one({key:key_id},{"$push":{field:value}})
+        self.db[collection].update_one({key:key_id},{"$push":{field:value}},upsert=True)
 
     def insert_many_to_array(self,collection,key,key_id,field,values):
         self.db[collection].update_one({key:key_id},{"$addToSet":{field:{"$each":values}}})

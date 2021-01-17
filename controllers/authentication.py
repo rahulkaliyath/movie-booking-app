@@ -26,6 +26,7 @@ class Authenticate:
             },"error"
         else:
             input_data['user'] = data['user'] 
+            input_data['user_id'] = data['user_id']
             return input_data,"success"
 
 
@@ -41,11 +42,11 @@ class Authenticate:
             user_exists = self.db.get_doc_count("users",{"email":email,"password":password})
 
             if user_exists:
-                user = self.db.get_values("users",{"email":email},["name"],["_id"])[0]['name']
+                user_details = self.db.get_one_value("users",{"email":email},["name","user_id"],["_id"])
                 expiration_time= datetime.datetime.utcnow() + datetime.timedelta(days=2)
-                payload = {"exp":expiration_time, "user":user}
+                payload = {"exp":expiration_time, "user":user_details['name'],"user_id":user_details['user_id']}
                 token = jwt.encode(payload,"secret").decode('utf-8')
-                output =  {"status":"success","jwt_token":token , "user":user}
+                output =  {"status":"success","jwt_token":token , "user":user_details['name'],"user_id":user_details['user_id']}
 
             else:
                 output["status"] = "error"
