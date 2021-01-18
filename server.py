@@ -45,12 +45,12 @@ def list_movies():
     result = movies.list_movies()
     return jsonify(result)
 
-@app.route('/movie_details',methods=['GET'])
+@app.route('/movie_details',methods=['POST'])
 def movie_details():
     result = movies.movie_details()
     return jsonify(result)
 
-@app.route('/show_timings',methods=['GET'])
+@app.route('/show_timings',methods=['POST'])
 def show_timings():
     result = timing.show_timings()
     return jsonify(result)
@@ -63,7 +63,7 @@ def add_show_time(input,start_time):
     return jsonify(result)
 
 
-@app.route('/check_availability',methods=['GET'])
+@app.route('/check_availability',methods=['POST'])
 def check_availability():
     result = timing.check_availability()
     return jsonify(result)
@@ -79,6 +79,12 @@ def book_ticket(input,start_time):
 @validate_token
 def cancel_ticket(input,start_time):
     result = booking.cancel_ticket(input)
+    return jsonify(result)
+
+@app.route('/get_upcoming_bookings',methods=['POST'])
+@validate_token
+def get_upcoming_bookings(input,start_time):
+    result = booking.get_upcoming_bookings(input)
     return jsonify(result)
 
 @app.route('/add_movie',methods=['POST'])

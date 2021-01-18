@@ -14,12 +14,18 @@ class Availabilty:
             input = request.get_json(force=True)
             body =input['body']
             movie_id = body['movie_id']
-            date = body['date']
+            print(input)
             
             timings = self.db.get_one_value('timings',
-            {"movie_id":movie_id,"show_timings":{"$elemMatch": {"date":date}}},[],["_id"])
+            {"movie_id":movie_id},[],["_id"])
+            timings['show_timings'] = sorted(timings['show_timings'], key=lambda k: (k['date'])) 
+            print(timings)
+            for show_time in timings['show_timings']:
+                keys = list(show_time.keys())
+                keys.remove('date')
+                show_time.update({"times":keys})
 
-            output['timings'] = timings
+            output['timings'] = timings['show_timings']
             output["status"] = "success"
 
         except Exception as e:
@@ -54,15 +60,17 @@ class Availabilty:
             movie_id = body['movie_id']
             date = body['date']
             time = body['time']
-            seat = body['seats']
+            # seat = body['seats']
             
-            timings = self.db.get_one_value('timings',
-            {"movie_id":movie_id,"show_timings":{"$elemMatch": {"date":date}}},[],["_id"])
+            timings = self.db.aggregate("timings",date,movie_id)
 
-            available_seats = timings['show_timings'][0][time]
+            if timings:
 
-            output['available_seats'] = available_seats
-            output["status"] = "success"
+                
+                available_seats = timings[0]['_id'][time]
+
+                output['available_seats'] = available_seats
+                output["status"] = "success"
 
         except Exception as e:
             output["status"] = "error"

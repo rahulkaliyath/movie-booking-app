@@ -75,4 +75,14 @@ class Database:
     def update_array_value(self,collection,filter,operation):
         self.db[collection].update_one(filter,operation)   
 
+    def aggregate(self,collection,date,movie_id):
+        out =  self.db[collection].aggregate([
+                {"$unwind": "$show_timings"},
+                {"$unwind": "$show_timings.date"},
+                {"$match": {"show_timings.date" : date,"movie_id":movie_id}},
+                {"$project" : {"show_timings" : 1}},
+                {"$group":{"_id":"$show_timings"}}
+        ])
+        return list(out)
+
 

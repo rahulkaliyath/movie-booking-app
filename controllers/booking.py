@@ -1,12 +1,14 @@
 from model import db_connection
 from helper import id_generator,paginated_results
-from controllers import availability
+from controllers import availability, movies
 from flask import request
 from datetime import time
 import datetime
 import copy
+import time
 
 avail = availability.Availabilty()
+movies = movies.Movies()
 class Booking:
     def __init__(self):
         self.db=db_connection.Database()
@@ -33,7 +35,7 @@ class Booking:
             movie_id = body['movie_id']
             date = body['date']
             time = body['time']
-            seats = body['seats']
+            seats = int(body['seats'])
 
             out= avail.check_availability()
 
@@ -75,7 +77,7 @@ class Booking:
                 booking_id = booking_details['booking_id']
 
                 self.db.insert_one_data('bookings',copy.copy(booking_details))
-                self.db.insert_one_to_array('account_details',"user_id",user_id,"upcoming_movies",booking_id)
+                self.db.insert_one_to_array('account_details',"user_id",user_id,"upcoming_bookings",booking_id)
 
 
                 
@@ -110,9 +112,12 @@ class Booking:
             show_time = ticket['show_time'].strftime('%I-%M%p')
             seats = ticket['seats']
 
-            if (datetime.datetime.now() + datetime.timedelta(hours=2)) > (ticket['show_time']-datetime.timedelta(hours=2)):
-                output["status"] = "error"
-                output['message'] = "You cannot cancel now"
+            print((datetime.datetime.now() + datetime.timedelta(hours=1)) , (ticket['show_time']))
+            print((datetime.datetime.now() + datetime.timedelta(hours=1)) > (ticket['show_time']))
+
+
+            if (datetime.datetime.now() + datetime.timedelta(hours=2)) > (ticket['show_time']):
+                raise ValueError("You cannot cancel movie now")
             
             else:
                 
@@ -129,10 +134,10 @@ class Booking:
                         }
                 
                 self.db.update_array_value("timings",filters,operation)
-                self.db.delete_one_from_array('account_details',"user_id",user_id,"upcoming_movies",booking_id)
-                self.db.insert_one_to_array('account_details',"user_id",user_id,"cancelled_movies",booking_id)
+                self.db.delete_one_from_array('account_details',"user_id",user_id,"upcoming_bookings",booking_id)
+                self.db.insert_one_to_array('account_details',"user_id",user_id,"cancelled_bookings",booking_id)
 
-                output["status"] = ticket
+                output["status"] = "success"
                 output['message'] = "status"
 
 
@@ -143,3 +148,24 @@ class Booking:
 
         return output
     
+    def get_upcoming_bookings(self,input):
+        output ={"status": "" , "message" : ""}
+        try:
+            user_id = input['user_id']
+
+            upcoming_booking_ids = self.db.get_one_value('account_details',{"user_id":user_id},['upcoming_bookings'],["_id"])['upcoming_bookings']
+
+            upcoming_booking = []
+            print(upcoming_booking_ids)
+            for ids in upcoming_booking_ids:
+
+                booking_details = self.db.get_one_value('bookings',{"booking_id":ids},[],["_id"])
+                movie_details  = self.db.get_one_value('movies',{"movie_id":booking_details['movie_id']},[],["_id","description","genre"])
+                booking_details.update(movie_details)
+                upcoming_booking.append(booking_details)
+
+                
+
+            return upcoming_booking
+        except Exception as e:
+            print(str(e))
