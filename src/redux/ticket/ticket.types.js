@@ -1,0 +1,8 @@
+const ticketActionTypes = {
+    GET_AVAILABLE_SEATS : "GET_AVAILABLE_SEATS",
+    BOOK_TICKET : "BOOK_TICKET",
+    GET_UPCOMING_BOOKINGS : "GET_UPCOMING_BOOKINGS",
+    CANCEL_MOVIE : "CANCEL_MOVIE"
+};
+
+export default ticketActionTypes;

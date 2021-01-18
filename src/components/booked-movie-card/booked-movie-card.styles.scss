@@ -1,0 +1,27 @@
+.booked-card {
+    border: 1px solid #d3d3d3;
+    border-radius: .25rem;
+    width: 600px;
+    margin: 15px;
+  
+  
+  .bg-img {
+    background-size: cover;
+    min-height: 180px;
+    background-position: center;
+    background-color: #ccc;
+  }
+  
+  .content {
+    padding: 15px;
+  }
+  
+  button {
+    background-color: transparent;
+    border: 1px solid #2196F3;
+    padding: .5rem 1rem;
+    cursor: pointer;
+    border-radius: .25rem;
+  }
+
+}
